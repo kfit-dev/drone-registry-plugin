@@ -22,6 +22,11 @@ type spec struct {
 	Config  string `envconfig:"DRONE_CONFIG_FILE" required:"true"`
 }
 
+func healthzHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func main() {
 	spec := new(spec)
 	err := envconfig.Process("", spec)
@@ -44,5 +49,7 @@ func main() {
 	logrus.Infof("server listening on address %s", spec.Address)
 
 	http.Handle("/", handler)
+	http.HandleFunc("/healthz", healthzHandler)
+
 	logrus.Fatal(http.ListenAndServe(spec.Address, nil))
 }
